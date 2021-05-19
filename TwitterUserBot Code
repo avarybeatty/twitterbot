@@ -1,0 +1,77 @@
+#Twitter User Bot
+
+import tweepy
+
+# Authentication Keys
+CONSUMER_KEY = "Insert your consumer key"
+CONSUMER_KEY_SECRET = "Insert yout consumer key secret"
+ACCESS_TOKEN = "insert your access token"
+ACCESS_TOKEN_SECRET = "insert your access token secret"
+
+# Authentication
+authenticate = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_KEY_SECRET)
+authenticate.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+
+#  Create API Object
+api = tweepy.API(authenticate, wait_on_rate_limit=True, 
+                 wait_on_rate_limit_notify=True)
+                 
+# Example Twitter User Account
+twitter_user = api.get_user('JoeBiden')
+
+# Message from bot to User
+print('Greetings, I will display twitter account data based on your user input. You will be able to recieve information on user account name, ID, number of friends, followers, and the 2 most recent followers and 2 most recent tweets for the account.\n')
+
+print('What twitter account do you want to look up? Just enter their @ username below. All coordinating information will then follow.')
+
+print('When you are finished using this bot, just enter "DONE"!')
+
+# Define variable user_input
+user_input = input()
+
+# When the user is finished, they will type "DONE"
+while user_input != "DONE":
+
+    # When account information is pulled 
+    try: 
+    
+        user = api.get_user(user_input)
+        #print the user name, actual name, id, description, location, number of friends, number of followers, 2 most recent followers and 2 most recent tweets
+        print("========RESULT=========")
+        print("User Name: ", user.screen_name)
+        print("Name: ", user.name)
+        print("ID: ", user.id)
+        print("Number of Friends: ", user.friends_count )
+        print("Number of Followers: ", user.followers_count)
+        print("\n2 most recent followers:")
+
+# Break results into pages, pulls information from pages
+        cursor = tweepy.Cursor(api.followers,  screen_name=user.screen_name)
+
+        for follower in cursor.items(2):
+            print(follower.screen_name)
+ 
+
+        print("\n This profile's 2 most recent tweets are:")
+
+        numTweets = 2
+
+        # authentication between active user name and their tweets
+        tweets = api.user_timeline(user.screen_name, count = numTweets)
+
+        #both tweets will be labeled as TWEET 1 & TWEET 2 
+        for tweet in range(numTweets):
+            print(f'TWEET #{tweet+1}: {tweets[tweet].text}\n')
+
+    # When username does not exist or entered with an error
+    except:
+        print("Sorry, it looks like the user you are looking up does not exist. Try again?")
+
+
+    # User will be prompted to search another user account until they are finished with bot
+    print('\n Enter another @ user name to search another user! If you are all finished, please type "DONE"')
+    user_input = input()
+
+# When the user types "DONE", bot will end interface.
+if user_input == "DONE":
+    exit()
